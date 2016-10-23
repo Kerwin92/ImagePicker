@@ -240,9 +240,7 @@ public class ImagePicker {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         takePictureIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         if (takePictureIntent.resolveActivity(activity.getPackageManager()) != null) {
-            if (Utils.existSDCard())
-                takeImageFile = new File(Environment.getExternalStorageDirectory(), "/DCIM/camera/");
-            else takeImageFile = Environment.getDataDirectory();
+            takeImageFile = createFolder(activity);
             takeImageFile = createFile(takeImageFile, "IMG_", ".jpg");
             if (takeImageFile != null) {
                 // 默认情况下，即不需要指定intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
@@ -297,5 +295,18 @@ public class ImagePicker {
         for (OnImageSelectedListener l : mImageSelectedListeners) {
             l.onImageSelected(position, item, isAdd);
         }
+    }
+    
+    private File createFolder(Context context){
+        String state = Environment.getExternalStorageState();
+        File file;
+        if(state.equals(Environment.MEDIA_MOUNTED)){
+            // 已挂载
+            file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+            return tmpFile;
+        }else{
+            file= context.getCacheDir();
+        }
+    return file;
     }
 }
